@@ -63,6 +63,13 @@ internal object ParseCwtUsingKotlinx : ParseCwt<ByteArray, ByteArray> {
 
     override suspend fun invoke(input: ByteArray): CoseProtectedHeaderAndPayload<ByteArray, ByteArray> = parseCoseSign1(input)
 
+    /**
+     * Decodes a COSE_Sign1 structure, tagged with exactly [RFC8152.COSE_SIGN1_TAG] (18).
+     *
+     * [StatiumCbor] is based on [kotlinx.serialization.cbor.Cbor.CoseCompliant], which verifies object tags.
+     * Thus, the input is rejected if it is untagged, carries a different tag (e.g. COSE_Mac0 (17)),
+     * or carries additional tags, such as the CWT CBOR Tag (61) that MUST NOT be used on Status List Tokens.
+     */
     private val parseCoseSign1: ParseCwt<ByteArray, ByteArray> = ParseCwt { input ->
         /**
          * In this context, we don't care about the protected header
